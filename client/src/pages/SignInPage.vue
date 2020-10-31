@@ -65,8 +65,13 @@ export default {
   methods: {
     ...mapActions(["updateUserAuth"]),
     onSubmit() {
+      const getCookie = function (name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+      };
       this.$http
-        ._post("/users/login", { email: this.email, password: this.password })
+        ._post("/users/login", { email: this.email, password: this.password, _csrf: getCookie('_csrf') })
         .then(body => {
           return this.updateUserAuth({
             isAuth: true,
