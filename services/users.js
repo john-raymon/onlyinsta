@@ -18,6 +18,9 @@ const isBodyMissingProps = require('@/utils/isBodyMissingProps');
  */
 const { userPassport } = require('@/config/passport');
 
+
+const csrfProtection = require('csurf')();
+
 module.exports = {
   /**
    *  create a new User resource
@@ -100,6 +103,7 @@ module.exports = {
    * Authenticate and login a User resource
    */
   login: [
+    csrfProtection,
     (req, res, next) => {
       const requiredProps = [
         ['email', 'Your email and password are required to sign in.', true],

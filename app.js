@@ -15,6 +15,7 @@ const logger = require('morgan');
 const helmet = require('helmet');
 const history = require('connect-history-api-fallback');
 const passport = require("passport");
+const csrf = require('csurf');
 const app = express();
 
 // Set up Mongodb
@@ -32,7 +33,7 @@ if (isProduction) {
 
 app.use(session({
   secret: secretKey,
-  saveUninitialized: false,
+  saveUninitialized: true,
   store: new MongoStore({ mongooseConnection: mongoose.connection, collection: 'sessions' }),
   cookie: {
     httpOnly: true,
@@ -67,14 +68,13 @@ app.use(express.urlencoded({ extended: false }));
 // app.use(cookieParser());
 
 app.use(history());
-app.use(express.static('./client/dist'));
+
+app.get("/*", function(req, res, next) {
+  return express.static('./client/dist')(req, res, next);
+});
 
 // API endpoints
 app.use('/api', require('./routes/api'));
-
-app.get("/*", function(req, res) {
-  return res.sendFile("./client/public/index.html");
-});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
